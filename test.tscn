@@ -7,11 +7,10 @@
 script = ExtResource("1_8uh7m")
 
 [node name="Card" parent="." unique_id=2022182795 instance=ExtResource("2_6uqi0")]
-offset_left = 521.0
-offset_top = -43.0
-offset_right = 1292.429
-offset_bottom = 1037.0
-scale = Vector2(0.545, 0.545)
+offset_left = 551.0
+offset_top = 308.0
+offset_right = 1322.429
+offset_bottom = 1388.0
 value = "the"
 score = 12
 is_faceup = false

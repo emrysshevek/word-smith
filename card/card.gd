@@ -29,14 +29,26 @@ var _is_faceup = true
 	set(val):
 		if bool(val) != is_faceup:
 			flip()
+@export var move_speed := 1000.0
 
+var center: Vector2:
+	get:
+		return size / 2
 
 func _ready() -> void:
 	_update_display()
 	
 	
 func flip() -> void:
-	ap.play("flip")
+	#ap.play("flip")
+	pass
+	
+func move_to(coordinates: Vector2) -> void:
+	var move_duration = global_position.distance_to(coordinates) / move_speed
+	var tween := get_tree().create_tween()
+	tween.set_ease(tween.EASE_OUT)
+	tween.set_trans(tween.TRANS_ELASTIC)
+	tween.tween_property(self, "global_position", coordinates, move_duration)
 	
 
 func _flip() -> bool:

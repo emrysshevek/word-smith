@@ -8,6 +8,8 @@ var hovered = false
 func _process(_delta: float) -> void:
 	if Input.is_action_just_pressed("rmb"):
 		card.flip()
+	if Input.is_action_just_pressed("lmb"):
+		card.move_to(get_global_mouse_position())
 		
 	
 
