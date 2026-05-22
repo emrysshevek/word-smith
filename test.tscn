@@ -1,0 +1,20 @@
+[gd_scene format=3 uid="uid://dcvbvvuatn1rm"]
+
+[ext_resource type="Script" uid="uid://bxnhuigachym2" path="res://test.gd" id="1_8uh7m"]
+[ext_resource type="PackedScene" uid="uid://be1cwkcep3l6v" path="res://card/card.tscn" id="2_6uqi0"]
+
+[node name="Test" type="Node2D" unique_id=1408954051]
+script = ExtResource("1_8uh7m")
+
+[node name="Card" parent="." unique_id=2022182795 instance=ExtResource("2_6uqi0")]
+offset_left = 521.0
+offset_top = -43.0
+offset_right = 1292.429
+offset_bottom = 1037.0
+scale = Vector2(0.545, 0.545)
+value = "the"
+score = 12
+is_faceup = false
+
+[connection signal="mouse_entered" from="Card" to="." method="_on_card_mouse_entered"]
+[connection signal="mouse_exited" from="Card" to="." method="_on_card_mouse_exited"]
