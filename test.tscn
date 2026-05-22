@@ -7,13 +7,8 @@
 script = ExtResource("1_8uh7m")
 
 [node name="Card" parent="." unique_id=2022182795 instance=ExtResource("2_6uqi0")]
-offset_left = 551.0
-offset_top = 308.0
-offset_right = 1322.429
-offset_bottom = 1388.0
+position = Vector2(919, 593)
+scale = Vector2(0.31, 0.31)
 value = "the"
 score = 12
 is_faceup = false
-
-[connection signal="mouse_entered" from="Card" to="." method="_on_card_mouse_entered"]
-[connection signal="mouse_exited" from="Card" to="." method="_on_card_mouse_exited"]

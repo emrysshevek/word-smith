@@ -1,13 +1,6 @@
 class_name Card
-extends Control
+extends Node2D
 
-@export_category("Nodes")
-@export var front: ColorRect
-@export var back: ColorRect
-@export var top_label: Label
-@export var center_label: Label
-@export var score_label: Label
-@export var ap: AnimationPlayer
 
 @export_category("Attributes")
 @export var value: String = "A":
@@ -28,27 +21,51 @@ var _is_faceup = true
 		return _is_faceup
 	set(val):
 		if bool(val) != is_faceup:
-			flip()
-@export var move_speed := 1000.0
+			flip.call_deferred()
+@export var move_speed := 2000.0
+@export var rot_speed: float = PI * 4
 
-var center: Vector2:
-	get:
-		return size / 2
+@export_category("Nodes")
+@export var front: Node
+@export var back: Node
+@export var top_label: Label
+@export var center_label: Label
+@export var score_label: Label
+
 
 func _ready() -> void:
 	_update_display()
 	
 	
 func flip() -> void:
-	#ap.play("flip")
-	pass
+	var starting_scale = scale
+	var tween1 = get_tree().create_tween()
+	tween1.tween_property(self, "scale", Vector2(0, starting_scale.y), .1)
+	tween1.finished.connect(
+		func():
+			_flip()
+			var tween2 = get_tree().create_tween()
+			tween2.tween_property(self, "scale", starting_scale, .1)
+	)
 	
 func move_to(coordinates: Vector2) -> void:
 	var move_duration = global_position.distance_to(coordinates) / move_speed
+	var direction = global_position.direction_to(coordinates).rotated(PI/2)
+	if coordinates.y > global_position.y:
+		direction *= -1
+	var angle = (Vector2(1,-1) * direction).angle()
+	var rot_time_required = abs(angle) / rot_speed
+	var rot_duration = min(move_duration, rot_time_required)
+	var max_rotation = min(abs(rot_speed * rot_duration), PI/3)
+	var allowed_rotation = min(abs(angle), max_rotation)
+	angle = clamp(angle, -allowed_rotation, allowed_rotation)
+	
 	var tween := get_tree().create_tween()
-	tween.set_ease(tween.EASE_OUT)
-	tween.set_trans(tween.TRANS_ELASTIC)
-	tween.tween_property(self, "global_position", coordinates, move_duration)
+	tween.set_parallel()
+	var move_tween = tween.tween_property(self, "global_position", coordinates, move_duration)
+	move_tween.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_EXPO)
+	tween.tween_property(self, "rotation", -angle, rot_duration)
+	tween.tween_property(self, "rotation", 0, rot_duration).set_delay(move_duration * .5)
 	
 
 func _flip() -> bool:
