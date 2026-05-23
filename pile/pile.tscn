@@ -1,0 +1,21 @@
+[gd_scene format=3 uid="uid://bktycnemi1007"]
+
+[ext_resource type="Script" uid="uid://7f6wrb0fnot5" path="res://pile/pile.gd" id="1_ebf4s"]
+
+[node name="Pile" type="Control" unique_id=221323126]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_ebf4s")
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=1701847895]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0.3137255, 0.050980393, 0.5568628)

@@ -7,7 +7,7 @@ var tween: Tween
 
 func enter(_previous_state_path: String, _data := {}) -> void:
 	tween = _tween_card_state(_default_state, .25)
-	
+
 func exit() -> void:
 	tween.kill()
 
