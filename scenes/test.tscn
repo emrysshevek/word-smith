@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://dcvbvvuatn1rm"]
 
-[ext_resource type="Script" uid="uid://bxnhuigachym2" path="res://test.gd" id="1_8uh7m"]
+[ext_resource type="Script" uid="uid://bxnhuigachym2" path="res://scenes/test.gd" id="1_8uh7m"]
 [ext_resource type="PackedScene" uid="uid://be1cwkcep3l6v" path="res://card/card.tscn" id="2_6uqi0"]
 
 [node name="Test" type="Node2D" unique_id=1408954051]

@@ -1,6 +1,9 @@
 class_name Card
 extends Node2D
 
+signal mouse_entered()
+signal mouse_exited()
+
 
 @export_category("Attributes")
 @export var value: String = "A":
@@ -83,4 +86,10 @@ func _update_display() -> void:
 	top_label.text = value
 	center_label.text = value
 	score_label.text = str(score)
+
 	
+func _on_mouse_entered() -> void:
+	mouse_entered.emit()
+
+func _on_mouse_exited() -> void:
+	mouse_exited.emit()
