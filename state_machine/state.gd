@@ -13,6 +13,7 @@ signal finished(next_state_path: String, data: Dictionary)
 
 
 func set_actor(actor: Node) -> void:
+	assert(self._actor == null, "State actor can only be set once")
 	self._actor = actor
 
 

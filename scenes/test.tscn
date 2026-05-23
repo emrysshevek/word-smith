@@ -11,4 +11,3 @@ position = Vector2(919, 593)
 scale = Vector2(0.31, 0.31)
 value = "the"
 score = 12
-is_faceup = false

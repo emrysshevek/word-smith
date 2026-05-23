@@ -35,6 +35,12 @@ var _is_faceup = true
 @export var center_label: Label
 @export var score_label: Label
 
+var state: State:
+	get:
+		return $StateMachine.state
+var mouse_over: bool = false
+		
+
 
 func _ready() -> void:
 	_update_display()
@@ -50,7 +56,7 @@ func flip() -> void:
 			var tween2 = get_tree().create_tween()
 			tween2.tween_property(self, "scale", starting_scale, .1)
 	)
-	
+
 func move_to(coordinates: Vector2) -> void:
 	var move_duration = global_position.distance_to(coordinates) / move_speed
 	var direction = global_position.direction_to(coordinates).rotated(PI/2)
@@ -89,7 +95,9 @@ func _update_display() -> void:
 
 	
 func _on_mouse_entered() -> void:
+	mouse_over = true
 	mouse_entered.emit()
 
 func _on_mouse_exited() -> void:
+	mouse_over = false
 	mouse_exited.emit()

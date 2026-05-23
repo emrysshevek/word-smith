@@ -4,6 +4,8 @@
 [ext_resource type="Script" uid="uid://b77v2nyxxxqsv" path="res://state_machine/state_machine.gd" id="2_fdnr0"]
 [ext_resource type="Script" uid="uid://dohang1jh8opp" path="res://card/behavior/card_idle_state.gd" id="3_346uv"]
 [ext_resource type="Script" uid="uid://2q03bme1exlt" path="res://card/behavior/card_hover_state.gd" id="4_i6okx"]
+[ext_resource type="Script" uid="uid://dn1aix3oxbmwp" path="res://card/behavior/card_select_state.gd" id="5_346uv"]
+[ext_resource type="Script" uid="uid://6842xqsxe4uh" path="res://card/behavior/card_drag_state.gd" id="6_i6okx"]
 
 [sub_resource type="Gradient" id="Gradient_fjcud"]
 offsets = PackedFloat32Array(0)
@@ -106,6 +108,12 @@ script = ExtResource("3_346uv")
 
 [node name="Hover" type="Node" parent="StateMachine" unique_id=1974480358]
 script = ExtResource("4_i6okx")
+
+[node name="Select" type="Node" parent="StateMachine" unique_id=1951382444]
+script = ExtResource("5_346uv")
+
+[node name="Drag" type="Node" parent="StateMachine" unique_id=908661030]
+script = ExtResource("6_i6okx")
 
 [connection signal="mouse_entered" from="Front/Control" to="." method="_on_mouse_entered"]
 [connection signal="mouse_exited" from="Front/Control" to="." method="_on_mouse_exited"]
