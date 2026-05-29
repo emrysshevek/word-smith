@@ -29,8 +29,8 @@ var _is_faceup = true
 @export var rot_speed: float = PI * 4
 
 @export_category("Nodes")
-@export var front: Node
-@export var back: Node
+@export var front: Sprite2D
+@export var back: Sprite2D
 @export var top_label: Label
 @export var center_label: Label
 @export var score_label: Label
