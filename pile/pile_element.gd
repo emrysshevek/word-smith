@@ -1,4 +1,4 @@
-class_name PileElement
+class_name _PileElement
 extends Node2D
 
 var movement_constraint := Vector2.RIGHT
