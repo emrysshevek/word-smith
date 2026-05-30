@@ -28,7 +28,7 @@ var c1: Vector2
 func _physics_process(_delta: float) -> void:		
 	if Input.is_action_just_pressed("lmb"):
 		c1 = get_global_mouse_position()
-	elif Input.is_action_just_released("lmb"):
+	elif Input.is_action_pressed("lmb"):
 		_reposition_with_corners(c1, get_global_mouse_position())
 		
 	if Input.is_action_just_pressed("ui_up"):
@@ -98,16 +98,10 @@ func _sort_elements() -> void:
 	var scale_factor = (width - _elem_props[elements[-1]]["size"][dir]) / (total_required_size[dir] - _elem_props[elements[-1]]["size"][dir])
 	if width < max_width:
 		scale_factor = 0
-	#var start_pos = global_position
-	#start_pos[1-dir] += size[1-dir] / 2
-	#var end_pos = global_position + size
-	#end_pos[1-dir] -= size[1-dir] /2
-	#end_pos[dir] -= elements[-1]
+
 	var center_pos = global_position + (size / 2)
 	var start_pos = center_pos
-	if max_width > width:
-		start_pos[dir] -= max_width / 2
-	start_pos[dir] -= width / 2
+	start_pos[dir] -= max(max_width, width) / 2
 	
 	# "center" = center - position. 
 	# Vector pointing from element's global_position to its center
