@@ -11,14 +11,9 @@ var count: int:
 	get:
 		return elements.size()
 var tween: Tween
-		
-class PileElement:
-	var size: Vector2
-	var center: Vector2
-	var position: Vector2
-	func _init(size: Vector2, center: Vector2) -> void:
-		self.size = size
-		self.center = center
+
+
+
 
 
 func _notification(what: int) -> void:
@@ -56,6 +51,12 @@ func add_element(element: Node, elem_size:=Vector2.ZERO, elem_center:=Vector2.ZE
 		elements.insert(index, element)
 	_elem_props[element] = PileElement.new(elem_size, elem_center)
 	
+	if element.has_signal("mouse_entered") and element.has_signal("mouse_exited"):
+		element.mouse_entered.connect(_on_element_mouse_entered.bind(element))
+		element.mouse_exited.connect(_on_element_mouse_exited.bind(element))
+	else:
+		push_warning("Element %s added to pile but does not have `mouse_entered` or `mouse_exited` signal. Some functionality will be lost." % element)
+		
 	queue_sort()
 
 
@@ -63,6 +64,10 @@ func remove_element(element: Node) -> void:
 	var idx = elements.find(element)
 	assert(idx != -1)
 	
+	if elements[idx].has_signal("mouse_entered") and elements[idx].has_signal("mouse_exited"):
+		elements[idx].mouse_entered.disconnect(_on_element_mouse_entered)
+		elements[idx].mouse_exited.disconnect(_on_element_mouse_entered)
+
 	elements.remove_at(idx)
 	_elem_props.erase(element)
 	
@@ -75,10 +80,10 @@ func shuffle_elements() -> void:
 
 
 func get_next_element(top:=true) -> Node:
-	var next: Node = elements.pop_at(0 if top else -1)
-	_elem_props.erase(next)
+	var elem := elements[0 if top else -1]
+	remove_element(elem)
 	queue_sort()
-	return next
+	return elem
 	
 
 func get_next_elements(count:int, top:=true) -> Array[Node]:
@@ -129,17 +134,17 @@ func _sort_elements() -> void:
 		var shift: float = max(3, props["size"][dir] * scale_factor)
 		curr_pos[dir] += shift
 		
-	_position_elements()
+	_position_elements(false)
 
 
-func _position_elements() -> void:
+func _position_elements(with_delay:=true) -> void:
 	if tween != null:
 		tween.kill()
 	
 	tween = create_tween().set_parallel()
 	
 	for i in elements.size():
-		_move_element(elements[i], _elem_props[elements[i]].position, i * .1, tween)
+		_move_element(elements[i], _elem_props[elements[i]].position, i * .1 if with_delay else 0, tween)
 
 
 func _move_element(element: Node, coordinates: Vector2, delay:=0.0, t:Tween=null) -> void:
@@ -156,8 +161,9 @@ func _move_element(element: Node, coordinates: Vector2, delay:=0.0, t:Tween=null
 	
 	if t == null:
 		t = create_tween().set_parallel()
-
-	var move_tween = t.tween_property(element, "global_position", coordinates, move_duration).set_delay(delay)
+	
+	var transform: TransformComponent = element.get_node("ComponentManager")
+	var move_tween = t.tween_property(transform, "position", coordinates, move_duration).set_delay(delay)
 	move_tween.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_EXPO)
 	
 	t.tween_property(element, "rotation", -angle, rot_duration).set_delay(delay)
@@ -185,6 +191,13 @@ func _reposition_with_corners(corner1: Vector2, corner2: Vector2) -> void:
 	
 	queue_sort()
 	
+
+func _on_element_mouse_entered(element: Node) -> void:
+	(element as CanvasItem).z_index = 1
 	
+func _on_element_mouse_exited(element: Node) -> void:
+	(element as CanvasItem).z_index = 0
+	
+
 #region Input testing
 #endregion

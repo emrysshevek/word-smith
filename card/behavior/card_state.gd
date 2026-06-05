@@ -24,7 +24,6 @@ class CardStateShorthand:
 		return CardStateShorthand.new(pos, rot, scale)
 		
 
-
 func set_actor(actor: Node) -> void:
 	super.set_actor(actor)
 	
@@ -38,6 +37,7 @@ func set_actor(actor: Node) -> void:
 	
 	_card.mouse_entered.connect(_on_card_mouse_entered)
 	_card.mouse_exited.connect(_on_card_mouse_exited)
+	_card.get_node("TransformComponent").changed.connect(_on_card_transform_changed)
 	
 	
 func handle_mouse_entered() -> void:
@@ -61,7 +61,7 @@ func _tween_card_state(card_state: CardStateShorthand, duration:=.1) -> Tween:
 	
 	return tween
 	
-	
+
 func _on_card_mouse_entered() -> void:
 	if active:
 		handle_mouse_entered()
@@ -69,3 +69,8 @@ func _on_card_mouse_entered() -> void:
 func _on_card_mouse_exited() -> void:
 	if active:
 		handle_mouse_exited()
+		
+func _on_card_transform_changed() -> void:
+	_default_state.pos = _card.global_position
+	_default_state.rot = _card.rotation
+	_default_state.scale = _card.scale

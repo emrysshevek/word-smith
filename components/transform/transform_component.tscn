@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://he6gkgm1kf2e"]
+
+[ext_resource type="Script" uid="uid://cbsbgilvxsjep" path="res://components/transform/transform_component.gd" id="1_vgksb"]
+
+[node name="TransformComponent" type="Node" unique_id=82241668]
+script = ExtResource("1_vgksb")

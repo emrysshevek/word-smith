@@ -1,10 +1,13 @@
 [gd_scene format=3 uid="uid://be1cwkcep3l6v"]
 
 [ext_resource type="Script" uid="uid://d3jc8pnoer46h" path="res://card/card.gd" id="1_fjcud"]
+[ext_resource type="Script" uid="uid://b77v2nyxxxqsv" path="res://components/state_machine/state_machine.gd" id="2_6xkbt"]
 [ext_resource type="Script" uid="uid://dohang1jh8opp" path="res://card/behavior/card_idle_state.gd" id="3_346uv"]
 [ext_resource type="Script" uid="uid://2q03bme1exlt" path="res://card/behavior/card_hover_state.gd" id="4_i6okx"]
 [ext_resource type="Script" uid="uid://dn1aix3oxbmwp" path="res://card/behavior/card_select_state.gd" id="5_346uv"]
+[ext_resource type="PackedScene" uid="uid://he6gkgm1kf2e" path="res://components/transform/transform_component.tscn" id="6_6xkbt"]
 [ext_resource type="Script" uid="uid://6842xqsxe4uh" path="res://card/behavior/card_drag_state.gd" id="6_i6okx"]
+[ext_resource type="PackedScene" uid="uid://bubbbjbiyje1k" path="res://components/component_manager.tscn" id="7_1n6wr"]
 
 [sub_resource type="Gradient" id="Gradient_346uv"]
 offsets = PackedFloat32Array(0)
@@ -33,13 +36,14 @@ gradient = SubResource("Gradient_ply2h")
 width = 771
 height = 1080
 
-[node name="Card" type="Node2D" unique_id=987663450 node_paths=PackedStringArray("front", "back", "top_label", "center_label", "score_label")]
+[node name="Card" type="Node2D" unique_id=987663450 node_paths=PackedStringArray("front", "back", "top_label", "center_label", "score_label", "transform_component")]
 script = ExtResource("1_fjcud")
 front = NodePath("Front")
 back = NodePath("Back")
 top_label = NodePath("Front/Control/MarginContainer/DisplayTop/ValueLabelTop")
 center_label = NodePath("Front/Control/MarginContainer/ValueLabelCenter")
 score_label = NodePath("Front/Control/MarginContainer/DisplayTop/ScoreLabel")
+transform_component = NodePath("ComponentManager/TransformComponent")
 
 [node name="Outline" type="Sprite2D" parent="." unique_id=745311116]
 texture = SubResource("GradientTexture2D_i6okx")
@@ -112,6 +116,7 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="StateMachine" type="Node" parent="." unique_id=1957252773]
+script = ExtResource("2_6xkbt")
 
 [node name="Idle" type="Node" parent="StateMachine" unique_id=581653510]
 script = ExtResource("3_346uv")
@@ -124,6 +129,10 @@ script = ExtResource("5_346uv")
 
 [node name="Drag" type="Node" parent="StateMachine" unique_id=908661030]
 script = ExtResource("6_i6okx")
+
+[node name="ComponentManager" parent="." unique_id=516546499 instance=ExtResource("7_1n6wr")]
+
+[node name="TransformComponent" parent="ComponentManager" unique_id=82241668 instance=ExtResource("6_6xkbt")]
 
 [connection signal="mouse_entered" from="Front/Control" to="." method="_on_mouse_entered"]
 [connection signal="mouse_exited" from="Front/Control" to="." method="_on_mouse_exited"]

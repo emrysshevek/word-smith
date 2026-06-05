@@ -3,6 +3,7 @@ extends Node2D
 
 signal mouse_entered()
 signal mouse_exited()
+signal moved()
 
 
 @export_category("Attributes")
@@ -34,6 +35,10 @@ var _is_faceup = true
 @export var top_label: Label
 @export var center_label: Label
 @export var score_label: Label
+@export var component_manager: ComponentManager
+
+@export_category("Components")
+@export var transform_component: TransformComponent
 
 var state: State:
 	get:
@@ -76,6 +81,8 @@ func move_to(coordinates: Vector2) -> void:
 	tween.tween_property(self, "rotation", -angle, rot_duration)
 	tween.tween_property(self, "rotation", 0, rot_duration).set_delay(move_duration * .5)
 	
+	moved.emit()
+
 
 func _flip() -> bool:
 	_is_faceup = not _is_faceup
@@ -93,10 +100,11 @@ func _update_display() -> void:
 	center_label.text = value
 	score_label.text = str(score)
 
-	
+
 func _on_mouse_entered() -> void:
 	mouse_over = true
 	mouse_entered.emit()
+
 
 func _on_mouse_exited() -> void:
 	mouse_over = false
