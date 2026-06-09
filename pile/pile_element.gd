@@ -1,10 +1,10 @@
-class_name _PileElement
-extends Node2D
+class_name PileElement
+extends Node
 
-var movement_constraint := Vector2.RIGHT
+var size: Vector2
+var center: Vector2
+var position: Vector2
 
-
-func reposition(neighbors: Array[Node2D]) -> void:
-	var new_pos: Vector2 = neighbors.reduce(func(sum, x): return sum + x, Vector2.ZERO) / neighbors.size()
-	new_pos *= movement_constraint
-	
+func _init(size: Vector2, center: Vector2) -> void:
+	self.size = size
+	self.center = center

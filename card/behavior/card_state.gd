@@ -24,20 +24,22 @@ class CardStateShorthand:
 		return CardStateShorthand.new(pos, rot, scale)
 		
 
-
 func set_actor(actor: Node) -> void:
 	super.set_actor(actor)
 	
 	assert(actor is Card, "CardState can only be used in Card node")
 	_card = actor as Card
+	var transform = _card.component_manager.get_component(ComponentManager.TRANSFORM)
 	_default_state = CardStateShorthand.new(
-		_card.global_position,
-		_card.rotation,
-		_card.scale
+		transform.position,
+		transform.rotation,
+		transform.scale
 	)
 	
 	_card.mouse_entered.connect(_on_card_mouse_entered)
 	_card.mouse_exited.connect(_on_card_mouse_exited)
+	var cm = _card.get_node("ComponentManager")
+	cm.get_node(cm.TRANSFORM).changed.connect(_on_card_transform_changed)
 	
 	
 func handle_mouse_entered() -> void:
@@ -61,7 +63,7 @@ func _tween_card_state(card_state: CardStateShorthand, duration:=.1) -> Tween:
 	
 	return tween
 	
-	
+
 func _on_card_mouse_entered() -> void:
 	if active:
 		handle_mouse_entered()
@@ -69,3 +71,9 @@ func _on_card_mouse_entered() -> void:
 func _on_card_mouse_exited() -> void:
 	if active:
 		handle_mouse_exited()
+		
+func _on_card_transform_changed() -> void:
+	var t = _card.component_manager.get_component(ComponentManager.TRANSFORM)
+	_default_state.pos = t.position
+	_default_state.rot = t.rotation
+	_default_state.scale = t.scale

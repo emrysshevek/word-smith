@@ -2,7 +2,7 @@ class_name Pile
 extends Container
 
 
-@export var move_speed := 2000.0
+@export var move_speed := 500.0
 @export var rot_speed: float = PI * 4
 
 var _elem_props: Dictionary[Node, PileElement]
@@ -10,13 +10,10 @@ var elements: Array[Node]
 var count: int:
 	get:
 		return elements.size()
-		
-class PileElement:
-	var size: Vector2
-	var center: Vector2
-	func _init(size: Vector2, center: Vector2) -> void:
-		self.size = size
-		self.center = center
+var tween: Tween
+
+
+
 
 
 func _notification(what: int) -> void:
@@ -30,10 +27,14 @@ func _physics_process(_delta: float) -> void:
 		c1 = get_global_mouse_position()
 	elif Input.is_action_just_released("lmb"):
 		_reposition_with_corners(c1, get_global_mouse_position())
+	
+	if Input.is_action_just_pressed("rmb"):
+		_reposition_with_area(get_global_mouse_position() - size / 2, size)
 		
 	if Input.is_action_just_pressed("ui_up"):
 		var card: Card = preload("res://card/card.tscn").instantiate()
-		card.scale = Vector2(randf_range(.3, .5), randf_range(.3,.5))
+		card.scale = Vector2(randf_range(.4, .5), randf_range(.4,.5))
+		card.top_level = true
 		add_child(card)
 		add_element(card, card.back.texture.get_size() * card.scale)
 		#add_element(card, card.back.texture.get_size() * card.scale + Vector2(20,0))
@@ -50,6 +51,12 @@ func add_element(element: Node, elem_size:=Vector2.ZERO, elem_center:=Vector2.ZE
 		elements.insert(index, element)
 	_elem_props[element] = PileElement.new(elem_size, elem_center)
 	
+	if element.has_signal("mouse_entered") and element.has_signal("mouse_exited"):
+		element.mouse_entered.connect(_on_element_mouse_entered.bind(element))
+		element.mouse_exited.connect(_on_element_mouse_exited.bind(element))
+	else:
+		push_warning("Element %s added to pile but does not have `mouse_entered` or `mouse_exited` signal. Some functionality will be lost." % element)
+		
 	queue_sort()
 
 
@@ -57,6 +64,10 @@ func remove_element(element: Node) -> void:
 	var idx = elements.find(element)
 	assert(idx != -1)
 	
+	if elements[idx].has_signal("mouse_entered") and elements[idx].has_signal("mouse_exited"):
+		elements[idx].mouse_entered.disconnect(_on_element_mouse_entered)
+		elements[idx].mouse_exited.disconnect(_on_element_mouse_entered)
+
 	elements.remove_at(idx)
 	_elem_props.erase(element)
 	
@@ -69,10 +80,10 @@ func shuffle_elements() -> void:
 
 
 func get_next_element(top:=true) -> Node:
-	var next: Node = elements.pop_at(0 if top else -1)
-	_elem_props.erase(next)
+	var elem := elements[0 if top else -1]
+	remove_element(elem)
 	queue_sort()
-	return next
+	return elem
 	
 
 func get_next_elements(count:int, top:=true) -> Array[Node]:
@@ -101,30 +112,42 @@ func _sort_elements() -> void:
 
 	var center_pos = global_position + (size / 2)
 	var start_pos = center_pos
-	if max_width > width:
-		start_pos[dir] -= max_width / 2
-	start_pos[dir] -= width / 2
+	start_pos[dir] -= max(max_width, width) / 2
 	
 	# "center" = center - position. 
 	# Vector pointing from element's global_position to its center
 	var curr_pos: Vector2 = start_pos
-	for element in elements:
+	for i in count:
+		var elem := elements[i]
+		var props := _elem_props[elem]
 		# initialize offset to center element at curr pos
-		var offset: Vector2 = -_elem_props[element]["center"]
+		var offset: Vector2 = -props["center"]
 		# shift by half element width so edge is positioned at curr_pos
 		# account for scale factor so everything is squished consistently
-		offset[dir] += _elem_props[element]["size"][dir] / 2
+		offset[dir] += props.size[dir] / 2
 
 		#_move_element(element, curr_pos + offset)
-		element.global_position = curr_pos + offset
+		#element.global_position = curr_pos + offset
+		props.position = curr_pos + offset
 		
 		# shift curr_pos by width of element for next element
-		var shift: float = max(3, _elem_props[element]["size"][dir] * scale_factor)
+		var shift: float = max(3, props["size"][dir] * scale_factor)
 		curr_pos[dir] += shift
 		
-		
+	_position_elements(false)
 
-func _move_element(element: Node, coordinates: Vector2) -> void:
+
+func _position_elements(with_delay:=true) -> void:
+	if tween != null:
+		tween.kill()
+	
+	tween = create_tween().set_parallel()
+	
+	for i in elements.size():
+		_move_element(elements[i], _elem_props[elements[i]].position, i * .1 if with_delay else 0.0, tween)
+
+
+func _move_element(element: Node, coordinates: Vector2, delay:=0.0, t:Tween=null) -> void:
 	var move_duration = global_position.distance_to(coordinates) / move_speed
 	var direction = global_position.direction_to(coordinates).rotated(PI/2)
 	if coordinates.y > global_position.y:
@@ -136,12 +159,15 @@ func _move_element(element: Node, coordinates: Vector2) -> void:
 	var allowed_rotation = min(abs(angle), max_rotation)
 	angle = clamp(angle, -allowed_rotation, allowed_rotation)
 	
-	var tween := get_tree().create_tween()
-	tween.set_parallel()
-	var move_tween = tween.tween_property(self, "global_position", coordinates, move_duration)
+	if t == null:
+		t = create_tween().set_parallel()
+	
+	var transform: TransformComponent = element.component_manager.get_component(ComponentManager.TRANSFORM)
+	var move_tween = t.tween_property(transform, "position", coordinates, move_duration).set_delay(delay)
 	move_tween.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_EXPO)
-	tween.tween_property(element, "rotation", -angle, rot_duration)
-	tween.tween_property(self, "rotation", 0, rot_duration).set_delay(move_duration * .5)
+	
+	t.tween_property(element, "rotation", -angle, rot_duration).set_delay(delay)
+	t.tween_property(element, "rotation", 0, rot_duration).set_delay(delay + move_duration * .5)
 
 
 func _reposition_with_area(pos: Vector2, area: Vector2) -> void:
@@ -165,6 +191,13 @@ func _reposition_with_corners(corner1: Vector2, corner2: Vector2) -> void:
 	
 	queue_sort()
 	
+
+func _on_element_mouse_entered(element: Node) -> void:
+	(element as CanvasItem).z_index = 1
 	
+func _on_element_mouse_exited(element: Node) -> void:
+	(element as CanvasItem).z_index = 0
+	
+
 #region Input testing
 #endregion
