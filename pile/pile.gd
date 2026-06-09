@@ -33,7 +33,7 @@ func _physics_process(_delta: float) -> void:
 		
 	if Input.is_action_just_pressed("ui_up"):
 		var card: Card = preload("res://card/card.tscn").instantiate()
-		card.scale = Vector2(.5,.5)
+		card.scale = Vector2(randf_range(.3, .5), randf_range(.3,.5))
 		add_child(card)
 		add_element(card, card.back.texture.get_size() * card.scale)
 		#add_element(card, card.back.texture.get_size() * card.scale + Vector2(20,0))
@@ -98,11 +98,7 @@ func _sort_elements() -> void:
 	var scale_factor = (width - _elem_props[elements[-1]]["size"][dir]) / (total_required_size[dir] - _elem_props[elements[-1]]["size"][dir])
 	if width < max_width:
 		scale_factor = 0
-	#var start_pos = global_position
-	#start_pos[1-dir] += size[1-dir] / 2
-	#var end_pos = global_position + size
-	#end_pos[1-dir] -= size[1-dir] /2
-	#end_pos[dir] -= elements[-1]
+
 	var center_pos = global_position + (size / 2)
 	var start_pos = center_pos
 	if max_width > width:
