@@ -11,9 +11,8 @@ var is_holding := false
 
 
 func enter(_previous_state_path: String, _data := {}) -> void:
-	var hover_state := _default_state.copy()
-	hover_state.scale *= 1.05
-	tween = _tween_card_state(hover_state)
+	var t: TransformComponent = _card.component_manager.get_component(ComponentManager.TRANSFORM)
+	tween = _tween_card_state(CardStateShorthand.new(t.position, t.rotation, t.scale * 1.05))
 	
 	spinner = create_tween().set_loops().set_parallel(false)
 	spinner.set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_SINE)

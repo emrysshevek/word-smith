@@ -39,7 +39,7 @@ func set_actor(actor: Node) -> void:
 	_card.mouse_entered.connect(_on_card_mouse_entered)
 	_card.mouse_exited.connect(_on_card_mouse_exited)
 	var cm = _card.get_node("ComponentManager")
-	cm.get_node(cm.TRANSFORM).changed.connect(_on_card_transform_changed)
+	cm.get_component(cm.TRANSFORM).changed.connect(_on_card_transform_changed)
 	
 	
 func handle_mouse_entered() -> void:
